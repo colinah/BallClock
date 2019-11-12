@@ -38,14 +38,12 @@ class BallClock {
 
     show() {
         // //Que Position
-        console.log('queBalls: ', this.queBalls , 'quePath: ' , this.quePath)
         this.showBalls(this.queBalls,this.quePath,'quePosition');
         // //Min Position
         this.showBalls(this.minBalls,this.minPath,'minPosition');
         // //Five Min Position
         this.showBalls(this.fiveMinBalls,this.fiveMinPath,'fiveMinPosition');
         //Hour Position
-        console.log('this.hourBalls: ' , this.hourBalls)
         this.showBalls(this.hourBalls,this.hourPath,'hourPosition')
     
     }
