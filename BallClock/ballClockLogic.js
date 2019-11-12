@@ -15,7 +15,12 @@ class BallClock {
         this.movingBall = false;
     }
 
+    newUpdate() {
+        
+    }
+
     update() {
+        console.log('hourBalls: ',this.hourBalls)
         if(this.minBalls.length === 5 ){
             this.emptyMinPosition();
             this.movingBall = false;
@@ -38,10 +43,10 @@ class BallClock {
             if(!this.movingBall){
                 this.quePosition()
                 this.shiftQuePosition()
-
                 this.movingBall = true;
+                this.moveBallToMin = true;
                 return
-            } else {
+            } else if(this.moveBallToMin) {
                     this.moveBallPath(this.minBalls[this.minBalls.length-1],this.moveToMinPath,'pathPosition')
             }
         }
