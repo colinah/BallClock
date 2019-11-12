@@ -11,69 +11,56 @@ class BallClock {
         this.moveToMinPath = [];
         this.moveToFivePath = [];
         this.moveToHourPath = [];
-        this.moveBallToMin = false
-        this.movingBall = false;
-    }
-
-    newUpdate() {
-        
+        this.moveBallToMin = false;
+        this.movingBall = null
+        this.shiftque = true
     }
 
     update() {
-        console.log('hourBalls: ',this.hourBalls)
-        if(this.minBalls.length === 5 ){
-            this.emptyMinPosition();
-            this.movingBall = false;
+        if(this.hourBalls.length == 12){
+            this.emptyHourBalls();
         } else if(this.fiveMinBalls.length === 12){
-            for(let i = 11; i >= 0; i--){
-                if(i === 11){
-                    this.hourPosition(this.fiveMinBalls.pop(1));
-
-                } else {
-                    this.enterQue(this.fiveMinBalls.pop(1));
-                }
-            }
-        } else if(this.hourBalls.length === 12){
-            for(let i = 11; i > 0 ; i--){
-                // console.log('hour:' , this.hourBalls)
-                this.enterQue(this.hourBalls.pop(1));
-            };
-            this.movingBall = true;
-        } else {
-            if(!this.movingBall){
-                this.quePosition()
-                this.shiftQuePosition()
-                this.movingBall = true;
-                this.moveBallToMin = true;
-                return
-            } else if(this.moveBallToMin) {
-                    this.moveBallPath(this.minBalls[this.minBalls.length-1],this.moveToMinPath,'pathPosition')
-            }
+            this.emptyFiveMinPosition();
+        } else if(this.minBalls.length === 5) {
+            this.emptyMinPosition()
+        } else if(this.shiftque){
+            this.movingBall = this.queBalls.shift(1);
+            this.shiftque = false;
+            this.moveBallToMin = true;
+            this.shiftQuePosition();
+            this.moveBallPath(this.movingBall,this.moveToMinPath,'pathPosition')
+        } else if(this.moveBallToMin){
+                this.moveBallPath(this.movingBall,this.moveToMinPath,'pathPosition')
         }
+  
     }
     
 
     show() {
         // //Que Position
+        console.log('queBalls: ', this.queBalls , 'quePath: ' , this.quePath)
         this.showBalls(this.queBalls,this.quePath,'quePosition');
         // //Min Position
         this.showBalls(this.minBalls,this.minPath,'minPosition');
         // //Five Min Position
         this.showBalls(this.fiveMinBalls,this.fiveMinPath,'fiveMinPosition');
         //Hour Position
+        console.log('this.hourBalls: ' , this.hourBalls)
         this.showBalls(this.hourBalls,this.hourPath,'hourPosition')
     
     }
 
 
     moveBallPath = (ball,path,positionName) => {
+        if(ball[positionName] === path.length){
+            this.shiftque = true;
+            this.moveBallToMin = false;
+            this.minPosition(ball);
+            return
+        }
         fill(ball.color);
-        console.log(ball[positionName], path)
         circle(path[ball[positionName]].x,path[ball[positionName]].y, 20);
         ball[positionName] += 1;
-        if(ball[positionName] === path.length){
-            this.movingBall = false;
-        }
     };
 
     showBalls = (balls,path,positionName) => {
@@ -90,10 +77,6 @@ class BallClock {
         this.queBalls.push(newBall)
     }
 
-    quePosition = () => {
-        this.minPosition(this.queBalls.shift(1));
-    }
-
     shiftQuePosition = () => {
         for(let i = 0; i < this.queBalls.length; i++){
             this.queBalls[i].quePosition = this.queBalls[i].quePosition -1;
@@ -102,18 +85,41 @@ class BallClock {
 
     emptyMinPosition = () => {
         for(let i = 4; i >= 0; i--){
-                console.log('before' , this.minBalls[i])
             this.minBalls[i]['minPosition'] = null;
             this.minBalls[i]['fiveMinPosition'] = null;
-            this.minBalls[i]['hourPosition'] = null;
             this.minBalls[i]['pathPosition'] = 0;
-                console.log('AFTER ' , this.minBalls[i])
             if(i === 4){
                 this.fiveMinPosition(this.minBalls.pop(1));
             } else {
                 this.enterQue(this.minBalls.pop(1));
             }
          }
+    }
+
+    emptyFiveMinPosition = () => {
+        for(let i = 11; i >= 0; i--){
+                this.fiveMinBalls[i]['pathPosition'] = 0;
+            if(i === 11){
+                this.hourPosition(this.fiveMinBalls.pop(1));
+            } else {
+                this.enterQue(this.fiveMinBalls.pop(1));
+            }
+         }
+    }
+
+    emptyHourBalls = () => {
+        let keep = null
+        for(let i = 11; i >= 0; i--){
+            this.hourBalls[i]['minPosition'] = null;
+            this.hourBalls[i]['fiveMinPosition'] = null;
+            this.hourBalls[i]['pathPosition'] = 0;
+            if(i === 11){
+                keep = this.hourBalls.shift(1);
+            } else {
+                this.enterQue(this.hourBalls.pop(1));
+            }
+         }
+         this.hourBalls.push(keep);
     }
 
 
